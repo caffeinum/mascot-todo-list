@@ -7,8 +7,11 @@ export function MarkdownText({ content }: MarkdownTextProps) {
     const lines = text.split('\n')
     
     return lines.map((line, i) => {
+      // handle links [text](url)
+      let processed = line.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">$1</a>')
+      
       // handle bold **text**
-      let processed = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      processed = processed.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       
       // handle italic *text*
       processed = processed.replace(/\*(.+?)\*/g, '<em>$1</em>')
