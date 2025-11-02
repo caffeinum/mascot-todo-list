@@ -30,9 +30,26 @@ function App() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          WebkitAppRegion: 'drag'
+          WebkitAppRegion: 'drag',
+          border: '2px solid red',
+          position: 'relative'
         } as any}
       >
+        {/* drag handle */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            background: 'rgba(0, 0, 0, 0.2)',
+            WebkitAppRegion: 'drag',
+            cursor: 'move',
+            zIndex: 1000
+          } as any}
+        />
         <div 
           onClick={(e) => {
             e.stopPropagation();
@@ -45,7 +62,8 @@ function App() {
             WebkitUserSelect: 'none',
             cursor: 'pointer',
             WebkitAppRegion: 'no-drag',
-            pointerEvents: 'auto'
+            pointerEvents: 'auto',
+            border: '2px solid red'
           } as any}
         >
           🥺
@@ -61,10 +79,27 @@ function App() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-start',
       padding: '16px',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      border: '2px solid red',
+      position: 'relative'
     }}>
+      {/* drag handle */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '8px',
+          right: '8px',
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          background: 'rgba(0, 0, 0, 0.2)',
+          WebkitAppRegion: 'drag',
+          cursor: 'move',
+          zIndex: 1000
+        } as any}
+      />
       {/* emoji at top */}
       <div 
         style={{
@@ -72,10 +107,11 @@ function App() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          WebkitAppRegion: 'drag'
+          WebkitAppRegion: 'drag',
+          border: '2px solid red'
         } as any}
       >
-        <div style={{ fontSize: '96px', userSelect: 'none' }}>🥺</div>
+        <div style={{ fontSize: '96px', userSelect: 'none', border: '2px solid red' }}>🥺</div>
       </div>
 
       {/* chat container */}
@@ -91,7 +127,7 @@ function App() {
         gap: '8px',
         maxHeight: '300px',
         boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-        border: '1px solid rgba(0,0,0,0.1)'
+        border: '3px solid red'
       }}>
         {/* close button */}
         <div style={{
