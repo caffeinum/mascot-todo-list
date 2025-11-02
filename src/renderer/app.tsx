@@ -14,6 +14,16 @@ function App() {
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState('');
 
+  useEffect(() => {
+    console.log('showChat changed:', showChat);
+    if (window.electronAPI) {
+      console.log('calling toggleChat with:', showChat);
+      window.electronAPI.toggleChat(showChat);
+    } else {
+      console.log('electronAPI not available');
+    }
+  }, [showChat]);
+
   const handleSend = () => {
     if (input.trim()) {
       setMessages([...messages, input]);
