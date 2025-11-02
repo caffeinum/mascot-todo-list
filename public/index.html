@@ -5,11 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ai agent overlay</title>
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
+      width: 100%;
+      height: 100%;
       background: transparent;
       -webkit-app-region: drag;
+      overflow: hidden;
+    }
+    #app {
+      width: 100%;
+      height: 100%;
     }
     button, input, a {
       -webkit-app-region: no-drag;
