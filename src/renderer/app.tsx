@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { MOTI_SYSTEM_PROMPT } from "./constants/moti";
+import { MarkdownText } from "./components/MarkdownText";
 
 const API_KEY_STORAGE = "ELECTRON_GOOGLE_GENERATIVE_AI_API_KEY";
 
@@ -364,7 +365,7 @@ function App() {
                         }}
                       />
                     )}
-                    {msg.content}
+                    <MarkdownText content={msg.content} />
                   </div>
                 );
               })
