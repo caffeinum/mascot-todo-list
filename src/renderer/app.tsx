@@ -1,19 +1,24 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
-const API_KEY = "AIxxxxx";
-
-const google = createGoogleGenerativeAI({
-  apiKey: API_KEY,
-});
+const API_KEY_STORAGE = "ELECTRON_GOOGLE_GENERATIVE_AI_API_KEY";
 
 function App() {
   const [showChat, setShowChat] = useState(false);
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [apiKey, setApiKey] = useLocalStorage<string>(API_KEY_STORAGE, "");
+  const [showKeyModal, setShowKeyModal] = useState(false);
+  const [tempKey, setTempKey] = useState("");
+
+  const google = useMemo(() => {
+    if (!apiKey) return null;
+    return createGoogleGenerativeAI({ apiKey });
+  }, [apiKey]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -24,6 +29,11 @@ function App() {
     setIsLoading(true);
 
     try {
+      if (!apiKey || !google) {
+        setMessages((prev) => [...prev, "AI: Missing API key. Click the emoji to set it."]);
+        return;
+      }
+
       const { text } = await generateText({
         model: google("gemini-2.5-flash"),
         prompt: userMessage,
@@ -51,11 +61,11 @@ function App() {
           } as any
         }
       >
-        {/* emoji in top-right */}
         <div
           onClick={(e) => {
             e.stopPropagation();
-            console.log("emoji clicked!");
+            setTempKey(apiKey || "");
+            setShowKeyModal(true);
             setShowChat(true);
           }}
           style={
@@ -92,6 +102,80 @@ function App() {
             } as any
           }
         />
+        {showKeyModal && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0 as any,
+              background: "rgba(0,0,0,0.35)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              WebkitAppRegion: "no-drag",
+              zIndex: 2000,
+            } as any}
+          >
+            <div
+              style={{
+                width: 360,
+                maxWidth: "90vw",
+                background: "#fff",
+                borderRadius: 12,
+                boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+                padding: 16,
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ fontWeight: 600, fontSize: 16 }}>Enter API key</div>
+              <input
+                type="text"
+                value={tempKey}
+                onChange={(e) => setTempKey(e.target.value)}
+                placeholder="Google Generative AI API key"
+                style={{
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  border: "1px solid #ddd",
+                  outline: "none",
+                  fontSize: 14,
+                }}
+              />
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <button
+                  onClick={() => setShowKeyModal(false)}
+                  style={{
+                    background: "#f2f2f7",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "8px 12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setApiKey(tempKey.trim());
+                    setShowKeyModal(false);
+                  }}
+                  style={{
+                    background: "#0a84ff",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 8,
+                    padding: "8px 12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -109,6 +193,10 @@ function App() {
     >
       {/* emoji in top-right */}
       <div
+        onClick={() => {
+          setTempKey(apiKey || "");
+          setShowKeyModal(true);
+        }}
         style={
           {
             position: "absolute",
@@ -116,8 +204,9 @@ function App() {
             right: "40px",
             fontSize: "64px",
             userSelect: "none",
-            WebkitAppRegion: "drag",
+            WebkitAppRegion: "no-drag",
             zIndex: 999,
+            cursor: "pointer",
           } as any
         }
       >
@@ -302,6 +391,80 @@ function App() {
           </button>
         </div>
       </div>
+      {showKeyModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0 as any,
+            background: "rgba(0,0,0,0.35)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            WebkitAppRegion: "no-drag",
+            zIndex: 2000,
+          } as any}
+        >
+          <div
+            style={{
+              width: 360,
+              maxWidth: "90vw",
+              background: "#fff",
+              borderRadius: 12,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+              padding: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontWeight: 600, fontSize: 16 }}>Enter API key</div>
+            <input
+              type="text"
+              value={tempKey}
+              onChange={(e) => setTempKey(e.target.value)}
+              placeholder="Google Generative AI API key"
+              style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                border: "1px solid #ddd",
+                outline: "none",
+                fontSize: 14,
+              }}
+            />
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setShowKeyModal(false)}
+                style={{
+                  background: "#f2f2f7",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setApiKey(tempKey.trim());
+                  setShowKeyModal(false);
+                }}
+                style={{
+                  background: "#0a84ff",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer",
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
