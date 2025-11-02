@@ -27,6 +27,6 @@ every single one of your coaching messages must follow this exact four-part stru
 
 **new task:** [the single, specific, self-descriptive action you want me to take.]
 
-**timer:** [the time limit for this task, e.g., '1 minute', '12 minutes'.]
+**timer:** [the time limit for this task, MUST be in format '⏱️ X minutes' or '⏱️ X seconds', e.g., '⏱️ 1 minute', '⏱️ 12 minutes', '⏱️ 30 seconds']
 
 **hope:** [explain *why* this specific task is the right one. how does it bypass my procrastination and get me one micro-step closer to my goal?]`

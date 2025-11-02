@@ -19,6 +19,8 @@ function App() {
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [tempKey, setTempKey] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [timerEnd, setTimerEnd] = useState<number | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
 
   const google = useMemo(() => {
     if (!apiKey) return null;
@@ -28,6 +30,41 @@ function App() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (!timerEnd) {
+      setTimeRemaining("");
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const remaining = timerEnd - now;
+
+      if (remaining <= 0) {
+        setTimeRemaining("0:00");
+        setTimerEnd(null);
+        return;
+      }
+
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+      setTimeRemaining(`${minutes}:${seconds.toString().padStart(2, '0')}`);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerEnd]);
+
+  const extractTimeAndStartTimer = (aiMessage: string) => {
+    // look for "⏱️ X minutes" or "⏱️ X seconds"
+    const timeMatch = aiMessage.match(/⏱️\s*(\d+)\s*(minute|second)s?/i);
+    if (timeMatch && timeMatch[1] && timeMatch[2]) {
+      const amount = parseInt(timeMatch[1]);
+      const unit = timeMatch[2].toLowerCase();
+      const ms = unit === "minute" ? amount * 60000 : amount * 1000;
+      setTimerEnd(Date.now() + ms);
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -56,6 +93,7 @@ function App() {
       });
 
       setMessages((prev) => [...prev, { role: "ai", content: text }]);
+      extractTimeAndStartTimer(text);
     } catch (error) {
       console.error("Error calling Gemini:", error);
       setApiKey("");
@@ -266,11 +304,12 @@ function App() {
           border: "1px solid rgba(0,0,0,0.1)",
         }}
       >
-        {/* close button */}
+        {/* close button and timer */}
         <div
           style={{
             display: "flex",
-            justifyContent: "flex-start",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
           <button
@@ -286,6 +325,19 @@ function App() {
           >
             ✕
           </button>
+          {timeRemaining && (
+            <div
+              style={{
+                fontSize: "18px",
+                fontWeight: 600,
+                color: "#333",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {timeRemaining}
+            </div>
+          )}
+          <div style={{ width: "16px" }} />
         </div>
 
         {/* messages */}
@@ -325,8 +377,8 @@ function App() {
                   <div
                     key={i}
                     style={{
-                      background: isUser ? "white" : "#0a84ff",
-                      color: isUser ? "#333" : "white",
+                      background: "white",
+                      color: "#333",
                       padding: "12px 16px",
                       borderRadius: "20px",
                       maxWidth: "85%",
@@ -359,7 +411,7 @@ function App() {
                           bottom: "12px",
                           width: "0",
                           height: "0",
-                          borderRight: "8px solid #0a84ff",
+                          borderRight: "8px solid white",
                           borderTop: "8px solid transparent",
                           borderBottom: "8px solid transparent",
                         }}
@@ -462,6 +514,7 @@ function App() {
                 })
 
                 setMessages((prev) => [...prev, { role: "ai", content: text }])
+                extractTimeAndStartTimer(text)
               } catch (error) {
                 console.error("Error calling Gemini:", error)
                 setApiKey("")
@@ -513,6 +566,7 @@ function App() {
                 })
 
                 setMessages((prev) => [...prev, { role: "ai", content: text }])
+                extractTimeAndStartTimer(text)
               } catch (error) {
                 console.error("Error calling Gemini:", error)
                 setApiKey("")
