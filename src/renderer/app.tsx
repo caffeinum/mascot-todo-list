@@ -282,77 +282,84 @@ function App() {
           style={{
             flex: 1,
             overflowY: "auto",
+            marginBottom: "12px",
             display: "flex",
             flexDirection: "column",
-            justifyContent: "flex-end",
-            gap: "8px",
-            marginBottom: "12px",
           }}
         >
-          {messages.length === 0 ? (
-            <div
-              style={{
-                textAlign: "center",
-                color: "#999",
-                fontSize: "14px",
-                marginTop: "40px",
-              }}
-            >
-              start chatting...
-            </div>
-          ) : (
-            messages.map((msg, i) => {
-              const isUser = msg.role === "user";
-              const isAI = msg.role === "ai";
-              return (
-                <div
-                  key={i}
-                  style={{
-                    background: isUser ? "white" : "#0a84ff",
-                    color: isUser ? "#333" : "white",
-                    padding: "12px 16px",
-                    borderRadius: "20px",
-                    maxWidth: "85%",
-                    alignSelf: isUser ? "flex-end" : "flex-start",
-                    fontSize: "14px",
-                    wordWrap: "break-word",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                    position: "relative",
-                  }}
-                >
-                  {isUser && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        right: "-8px",
-                        bottom: "12px",
-                        width: "0",
-                        height: "0",
-                        borderLeft: "8px solid white",
-                        borderTop: "8px solid transparent",
-                        borderBottom: "8px solid transparent",
-                      }}
-                    />
-                  )}
-                  {isAI && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        left: "-8px",
-                        bottom: "12px",
-                        width: "0",
-                        height: "0",
-                        borderRight: "8px solid #0a84ff",
-                        borderTop: "8px solid transparent",
-                        borderBottom: "8px solid transparent",
-                      }}
-                    />
-                  )}
-                  {msg.content}
-                </div>
-              );
-            })
-          )}
+          <div style={{ flex: 1 }} />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+            }}
+          >
+            {messages.length === 0 ? (
+              <div
+                style={{
+                  textAlign: "center",
+                  color: "#999",
+                  fontSize: "14px",
+                  marginTop: "40px",
+                }}
+              >
+                start chatting...
+              </div>
+            ) : (
+              messages.map((msg, i) => {
+                const isUser = msg.role === "user";
+                const isAI = msg.role === "ai";
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      background: isUser ? "white" : "#0a84ff",
+                      color: isUser ? "#333" : "white",
+                      padding: "12px 16px",
+                      borderRadius: "20px",
+                      maxWidth: "85%",
+                      alignSelf: isUser ? "flex-end" : "flex-start",
+                      fontSize: "14px",
+                      wordWrap: "break-word",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                      position: "relative",
+                    }}
+                  >
+                    {isUser && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          right: "-8px",
+                          bottom: "12px",
+                          width: "0",
+                          height: "0",
+                          borderLeft: "8px solid white",
+                          borderTop: "8px solid transparent",
+                          borderBottom: "8px solid transparent",
+                        }}
+                      />
+                    )}
+                    {isAI && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          left: "-8px",
+                          bottom: "12px",
+                          width: "0",
+                          height: "0",
+                          borderRight: "8px solid #0a84ff",
+                          borderTop: "8px solid transparent",
+                          borderBottom: "8px solid transparent",
+                        }}
+                      />
+                    )}
+                    {msg.content}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
 
         {/* input */}
