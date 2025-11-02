@@ -25,7 +25,8 @@ function App() {
 
     const userMessage = input;
     setInput("");
-    setMessages([...messages, `You: ${userMessage}`]);
+    const updatedMessages = [...messages, `You: ${userMessage}`];
+    setMessages(updatedMessages);
     setIsLoading(true);
 
     try {
@@ -34,9 +35,14 @@ function App() {
         return;
       }
 
+      // build conversation history for context
+      const conversationHistory = updatedMessages
+        .map(msg => msg.replace(/^(You|AI): /, ''))
+        .join('\n');
+
       const { text } = await generateText({
         model: google("gemini-2.5-flash"),
-        prompt: userMessage,
+        prompt: conversationHistory,
       });
 
       setMessages((prev) => [...prev, `AI: ${text}`]);
