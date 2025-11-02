@@ -29,15 +29,18 @@ function App() {
 
   if (!showChat) {
     return (
-      <div style={{
-        width: '100vw',
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'move'
-      }}>
+      <div 
+        className="draggable"
+        style={{
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
         <div 
+          className="clickable"
           onClick={(e) => {
             e.stopPropagation();
             setShowChat(true);
@@ -68,13 +71,15 @@ function App() {
       boxSizing: 'border-box'
     }}>
       {/* header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '12px',
-        cursor: 'move'
-      }}>
+      <div 
+        className="draggable"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '12px'
+        }}
+      >
         <span style={{ fontSize: '24px' }}>🥺</span>
         <button
           onClick={() => setShowChat(false)}
