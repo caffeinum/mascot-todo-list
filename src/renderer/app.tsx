@@ -27,6 +27,7 @@ function App() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [timerEnd, setTimerEnd] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [isTimerExpired, setIsTimerExpired] = useState(false);
 
   const google = useMemo(() => {
     if (!apiKey) return null;
@@ -50,6 +51,7 @@ function App() {
       if (remaining <= 0) {
         setTimeRemaining("0:00");
         setTimerEnd(null);
+        setIsTimerExpired(true);
         return;
       }
 
@@ -69,6 +71,7 @@ function App() {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
+    setIsTimerExpired(false);
     const userMessage = input;
     setInput("");
     const updatedMessages: Message[] = [...messages, { role: "user", content: userMessage }];
@@ -260,8 +263,21 @@ function App() {
         padding: "16px",
         boxSizing: "border-box",
         position: "relative",
+        animation: isTimerExpired ? "shake 0.5s infinite" : "none",
       }}
     >
+      {isTimerExpired && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(255, 0, 0, 0.2)",
+            pointerEvents: "none",
+            zIndex: 9999,
+            animation: "pulse-red 1s ease-in-out infinite",
+          } as any}
+        />
+      )}
       {/* emoji in top-right */}
       <div
         onClick={() => {
@@ -549,6 +565,7 @@ function App() {
           <button
             onClick={async () => {
               if (isLoading) return
+              setIsTimerExpired(false)
               setInput("yes")
               const userMessage = "yes"
               const updatedMessages: Message[] = [...messages, { role: "user", content: userMessage }]
@@ -607,6 +624,7 @@ function App() {
           <button
             onClick={async () => {
               if (isLoading) return
+              setIsTimerExpired(false)
               setInput("no")
               const userMessage = "no"
               const updatedMessages: Message[] = [...messages, { role: "user", content: userMessage }]
