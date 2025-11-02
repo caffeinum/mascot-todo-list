@@ -29,7 +29,6 @@ function App() {
           height: '100vh',
           display: 'flex',
           WebkitAppRegion: 'drag',
-          border: '2px solid red',
           position: 'relative'
         } as any}
       >
@@ -64,8 +63,7 @@ function App() {
             WebkitUserSelect: 'none',
             cursor: 'pointer',
             WebkitAppRegion: 'no-drag',
-            pointerEvents: 'auto',
-            border: '2px solid red'
+            pointerEvents: 'auto'
           } as any}
         >
           🥺
@@ -81,7 +79,6 @@ function App() {
       display: 'flex',
       padding: '16px',
       boxSizing: 'border-box',
-      border: '2px solid red',
       position: 'relative'
     }}>
       {/* drag handle */}
@@ -109,7 +106,6 @@ function App() {
           fontSize: '64px',
           userSelect: 'none',
           WebkitAppRegion: 'drag',
-          border: '2px solid red',
           zIndex: 999
         } as any}
       >
@@ -129,7 +125,7 @@ function App() {
         flexDirection: 'column',
         gap: '8px',
         boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-        border: '3px solid red'
+        border: '1px solid rgba(0,0,0,0.1)'
       }}>
         {/* close button */}
         <div style={{
