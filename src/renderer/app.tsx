@@ -3,6 +3,7 @@ import { generateText } from "ai";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { useLocalStorage } from "./hooks/useLocalStorage";
+import { MOTI_SYSTEM_PROMPT } from "./constants/moti";
 
 const API_KEY_STORAGE = "ELECTRON_GOOGLE_GENERATIVE_AI_API_KEY";
 
@@ -38,24 +39,25 @@ function App() {
 
     try {
       if (!apiKey || !google) {
-        setMessages((prev) => [...prev, { role: "ai", content: "Missing API key. Click the emoji to set it." }]);
+        setMessages((prev) => [...prev, { role: "ai", content: "hey, i need an api key to help you. click the emoji to set it up." }]);
         return;
       }
 
-      // build conversation history for context
+      // build conversation history for moti
       const conversationHistory = updatedMessages
-        .map(msg => msg.content)
+        .map(msg => `${msg.role === "user" ? "user" : "moti"}: ${msg.content}`)
         .join('\n');
 
       const { text } = await generateText({
         model: google("gemini-2.5-flash"),
+        system: MOTI_SYSTEM_PROMPT,
         prompt: conversationHistory,
       });
 
       setMessages((prev) => [...prev, { role: "ai", content: text }]);
     } catch (error) {
       console.error("Error calling Gemini:", error);
-      setMessages((prev) => [...prev, { role: "ai", content: "Error generating response" }]);
+      setMessages((prev) => [...prev, { role: "ai", content: "something went wrong, can you try again?" }]);
     } finally {
       setIsLoading(false);
     }
@@ -309,7 +311,7 @@ function App() {
                   marginTop: "40px",
                 }}
               >
-                start chatting...
+                hey, i'm moti. tell me what you want to achieve and i'll help you get there, one small step at a time.
               </div>
             ) : (
               messages.map((msg, i) => {
@@ -385,7 +387,7 @@ function App() {
                 handleSend();
               }
             }}
-            placeholder="Type a message"
+            placeholder="did you complete it? or tell me what happened..."
             style={{
               flex: 1,
               padding: "14px 20px",
