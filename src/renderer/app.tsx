@@ -6,6 +6,7 @@ import { useLocalStorage } from "./hooks/useLocalStorage";
 import { MOTI_SYSTEM_PROMPT } from "./constants/moti";
 import { MarkdownText } from "./components/MarkdownText";
 import { z } from "zod";
+import { composioClient, type ToolRouterSession } from "./composio";
 
 const API_KEY_STORAGE = "ELECTRON_GOOGLE_GENERATIVE_AI_API_KEY";
 
@@ -28,6 +29,18 @@ function App() {
   const [timerEnd, setTimerEnd] = useState<number | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
   const [isTimerExpired, setIsTimerExpired] = useState(false);
+  
+  // composio state
+  const [showComposioModal, setShowComposioModal] = useState(false);
+  const [composioKey, setComposioKey] = useState(composioClient.getApiKey() || "");
+  const [tempComposioKey, setTempComposioKey] = useState("");
+  const [selectedToolkits, setSelectedToolkits] = useState<string[]>([]);
+  const [availableToolkits] = useState<string[]>([
+    'gmail', 'github', 'slack', 'notion', 'jira', 'linear', 
+    'figma', 'googlecalendar', 'googledrive', 'googlesheets'
+  ]);
+  const [currentSession, setCurrentSession] = useState<ToolRouterSession | null>(null);
+  const [showToolsPanel, setShowToolsPanel] = useState(false);
 
   const google = useMemo(() => {
     if (!apiKey) return null;
@@ -66,6 +79,39 @@ function App() {
   const startTimer = (timeMinutes: number) => {
     const ms = timeMinutes * 60000;
     setTimerEnd(Date.now() + ms);
+  };
+
+  const handleCreateSession = async () => {
+    if (!composioClient.isReady()) {
+      alert('please set composio api key first');
+      return;
+    }
+
+    try {
+      const session = await composioClient.createSession(
+        'user@example.com',
+        selectedToolkits.length > 0 ? selectedToolkits : undefined
+      );
+      
+      if (session) {
+        setCurrentSession(session);
+        setMessages(prev => [...prev, {
+          role: 'ai',
+          content: `✨ tool router session created!\n\n**session url:** ${session.url}\n\n**toolkits:** ${session.toolkits.length > 0 ? session.toolkits.join(', ') : 'all available'}\n\nthis mcp endpoint can now access composio tools for: ${session.toolkits.join(', ') || 'any toolkit'}`
+        }]);
+        setShowToolsPanel(false);
+      }
+    } catch (error) {
+      alert('failed to create session: ' + (error as Error).message);
+    }
+  };
+
+  const toggleToolkit = (toolkit: string) => {
+    setSelectedToolkits(prev => 
+      prev.includes(toolkit) 
+        ? prev.filter(t => t !== toolkit)
+        : [...prev, toolkit]
+    );
   };
 
   const handleSend = async () => {
@@ -300,6 +346,26 @@ function App() {
         🥺
       </div>
 
+      {/* composio tools button */}
+      <div
+        onClick={() => setShowToolsPanel(!showToolsPanel)}
+        style={
+          {
+            position: "absolute",
+            top: "90px",
+            right: "46px",
+            fontSize: "32px",
+            userSelect: "none",
+            WebkitAppRegion: "no-drag",
+            zIndex: 999,
+            cursor: "pointer",
+          } as any
+        }
+        title="composio tools"
+      >
+        🔧
+      </div>
+
       {/* small drag handle to the right of emoji */}
       <div
         style={
@@ -317,6 +383,248 @@ function App() {
           } as any
         }
       />
+
+      {/* composio tools panel */}
+      {showToolsPanel && (
+        <div
+          style={{
+            position: "absolute",
+            top: "130px",
+            right: "40px",
+            width: "320px",
+            maxHeight: "60vh",
+            background: "#fff",
+            borderRadius: 12,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+            padding: 16,
+            zIndex: 1001,
+            WebkitAppRegion: "no-drag",
+            overflowY: "auto",
+          }}
+        >
+          <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 12 }}>
+            composio tool router
+          </div>
+          
+          {!composioClient.isReady() ? (
+            <div>
+              <div style={{ fontSize: 14, color: "#666", marginBottom: 12 }}>
+                set your composio api key to get started
+              </div>
+              <button
+                onClick={() => {
+                  setTempComposioKey(composioKey);
+                  setShowComposioModal(true);
+                }}
+                style={{
+                  width: "100%",
+                  background: "#0a84ff",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "10px 16px",
+                  cursor: "pointer",
+                  fontSize: 14,
+                  fontWeight: 500,
+                }}
+              >
+                set composio api key
+              </button>
+            </div>
+          ) : (
+            <div>
+              {currentSession ? (
+                <div>
+                  <div style={{ 
+                    fontSize: 12, 
+                    color: "#0a84ff",
+                    marginBottom: 8,
+                    fontWeight: 600 
+                  }}>
+                    ✨ session active
+                  </div>
+                  <div style={{ 
+                    fontSize: 11, 
+                    color: "#666",
+                    marginBottom: 8,
+                    wordBreak: "break-all"
+                  }}>
+                    {currentSession.url}
+                  </div>
+                  <div style={{ fontSize: 12, color: "#333", marginBottom: 12 }}>
+                    <strong>toolkits:</strong> {currentSession.toolkits.length > 0 ? currentSession.toolkits.join(', ') : 'all'}
+                  </div>
+                  <button
+                    onClick={() => setCurrentSession(null)}
+                    style={{
+                      width: "100%",
+                      background: "#ff3b30",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "8px 12px",
+                      cursor: "pointer",
+                      fontSize: 13,
+                    }}
+                  >
+                    end session
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <div style={{ fontSize: 14, marginBottom: 12 }}>
+                    select toolkits (optional):
+                  </div>
+                  <div style={{ 
+                    display: "grid", 
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 6,
+                    marginBottom: 12 
+                  }}>
+                    {availableToolkits.map(toolkit => (
+                      <button
+                        key={toolkit}
+                        onClick={() => toggleToolkit(toolkit)}
+                        style={{
+                          background: selectedToolkits.includes(toolkit) ? "#0a84ff" : "#f2f2f7",
+                          color: selectedToolkits.includes(toolkit) ? "#fff" : "#333",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "6px 10px",
+                          cursor: "pointer",
+                          fontSize: 12,
+                          textAlign: "left",
+                        }}
+                      >
+                        {toolkit}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={handleCreateSession}
+                    style={{
+                      width: "100%",
+                      background: "#34c759",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "10px 16px",
+                      cursor: "pointer",
+                      fontSize: 14,
+                      fontWeight: 500,
+                    }}
+                  >
+                    create session
+                  </button>
+                  <button
+                    onClick={() => {
+                      setTempComposioKey(composioKey);
+                      setShowComposioModal(true);
+                    }}
+                    style={{
+                      width: "100%",
+                      background: "#f2f2f7",
+                      color: "#333",
+                      border: "none",
+                      borderRadius: 8,
+                      padding: "8px 12px",
+                      cursor: "pointer",
+                      fontSize: 13,
+                      marginTop: 8,
+                    }}
+                  >
+                    change api key
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* composio api key modal */}
+      {showComposioModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0 as any,
+            background: "rgba(0,0,0,0.35)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            WebkitAppRegion: "no-drag",
+            zIndex: 2000,
+          } as any}
+          onClick={() => setShowComposioModal(false)}
+        >
+          <div
+            style={{
+              width: 360,
+              maxWidth: "90vw",
+              background: "#fff",
+              borderRadius: 12,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+              padding: 16,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontWeight: 600, fontSize: 16 }}>composio api key</div>
+            <div style={{ fontSize: 13, color: "#666" }}>
+              get your api key from <a href="https://platform.composio.dev/settings" target="_blank" style={{ color: "#0a84ff" }}>composio settings</a>
+            </div>
+            <input
+              type="text"
+              value={tempComposioKey}
+              onChange={(e) => setTempComposioKey(e.target.value)}
+              placeholder="composio api key"
+              style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                border: "1px solid #ddd",
+                outline: "none",
+                fontSize: 14,
+              }}
+            />
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setShowComposioModal(false)}
+                style={{
+                  background: "#f2f2f7",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer",
+                }}
+              >
+                cancel
+              </button>
+              <button
+                onClick={() => {
+                  const key = tempComposioKey.trim();
+                  if (key) {
+                    composioClient.setApiKey(key);
+                    setComposioKey(key);
+                  }
+                  setShowComposioModal(false);
+                }}
+                style={{
+                  background: "#0a84ff",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 12px",
+                  cursor: "pointer",
+                }}
+              >
+                save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* chat container */}
       <div
