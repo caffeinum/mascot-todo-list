@@ -14,12 +14,6 @@ function App() {
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState('');
 
-  useEffect(() => {
-    if (window.electronAPI) {
-      window.electronAPI.toggleChat(showChat);
-    }
-  }, [showChat]);
-
   const handleSend = () => {
     if (input.trim()) {
       setMessages([...messages, input]);
@@ -42,6 +36,7 @@ function App() {
         <div 
           onClick={(e) => {
             e.stopPropagation();
+            console.log('emoji clicked!');
             setShowChat(true);
           }}
           style={{
@@ -49,7 +44,8 @@ function App() {
             userSelect: 'none',
             WebkitUserSelect: 'none',
             cursor: 'pointer',
-            WebkitAppRegion: 'no-drag'
+            WebkitAppRegion: 'no-drag',
+            pointerEvents: 'auto'
           } as any}
         >
           🥺
@@ -85,7 +81,7 @@ function App() {
       {/* chat container */}
       <div style={{
         width: '100%',
-        background: 'rgba(255, 255, 255, 0.95)',
+        background: 'rgba(255, 255, 255, 0.98)',
         backdropFilter: 'blur(20px)',
         borderRadius: '16px',
         padding: '12px',
@@ -93,7 +89,9 @@ function App() {
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
-        maxHeight: '300px'
+        maxHeight: '300px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+        border: '1px solid rgba(0,0,0,0.1)'
       }}>
         {/* close button */}
         <div style={{

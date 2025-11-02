@@ -11,9 +11,9 @@ function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
   mainWindow = new BrowserWindow({
-    width: 120,
-    height: 120,
-    x: width - 140,
+    width: 200,
+    height: 550,
+    x: width - 220,
     y: 40,
     transparent: true,
     frame: false,
@@ -31,25 +31,11 @@ function createWindow() {
   // always load from file in production build
   mainWindow.loadFile(path.join(__dirname, '../public/index.html'));
 
+  // open dev tools for debugging
+  mainWindow.webContents.openDevTools({ mode: 'detach' });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
-  });
-
-  // handle chat toggle
-  ipcMain.on('toggle-chat', (_event, show: boolean) => {
-    if (!mainWindow) return;
-    
-    const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
-    
-    if (show) {
-      // expand to chat mode - taller to fit emoji + chat
-      mainWindow.setSize(200, 550);
-      mainWindow.setPosition(screenWidth - 220, 40);
-    } else {
-      // collapse to emoji
-      mainWindow.setSize(120, 120);
-      mainWindow.setPosition(screenWidth - 140, 40);
-    }
   });
 }
 
