@@ -154,7 +154,7 @@ function App() {
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px',
+          gap: '8px',
           minHeight: '100px',
           maxHeight: '180px'
         }}>
@@ -162,8 +162,8 @@ function App() {
             <div style={{
               textAlign: 'center',
               color: '#999',
-              fontSize: '12px',
-              marginTop: '20px'
+              fontSize: '14px',
+              marginTop: '40px'
             }}>
               start chatting...
             </div>
@@ -172,16 +172,28 @@ function App() {
               <div
                 key={i}
                 style={{
-                  background: '#007aff',
-                  color: 'white',
-                  padding: '6px 10px',
-                  borderRadius: '12px',
-                  maxWidth: '80%',
-                  alignSelf: 'flex-end',
-                  fontSize: '13px',
-                  wordWrap: 'break-word'
+                  background: 'white',
+                  color: '#333',
+                  padding: '12px 16px',
+                  borderRadius: '20px',
+                  maxWidth: '85%',
+                  alignSelf: 'flex-start',
+                  fontSize: '14px',
+                  wordWrap: 'break-word',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  position: 'relative'
                 }}
               >
+                <div style={{
+                  position: 'absolute',
+                  left: '-8px',
+                  bottom: '12px',
+                  width: '0',
+                  height: '0',
+                  borderRight: '8px solid white',
+                  borderTop: '8px solid transparent',
+                  borderBottom: '8px solid transparent'
+                }} />
                 {msg}
               </div>
             ))
@@ -191,7 +203,8 @@ function App() {
         {/* input */}
         <div style={{
           display: 'flex',
-          gap: '6px'
+          gap: '8px',
+          alignItems: 'center'
         }}>
           <input
             type="text"
@@ -202,31 +215,39 @@ function App() {
                 handleSend();
               }
             }}
-            placeholder="type a message..."
+            placeholder="Type a message"
             style={{
               flex: 1,
-              padding: '8px 12px',
-              borderRadius: '16px',
-              border: '1px solid #ddd',
+              padding: '14px 20px',
+              borderRadius: '25px',
+              border: 'none',
               outline: 'none',
-              fontSize: '13px',
-              fontFamily: 'system-ui, -apple-system, sans-serif'
+              fontSize: '15px',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              background: 'white',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              color: '#333'
             }}
           />
           <button
             onClick={handleSend}
             style={{
-              background: '#007aff',
-              color: 'white',
+              width: '50px',
+              height: '50px',
+              borderRadius: '50%',
+              background: '#d1d1d6',
               border: 'none',
-              borderRadius: '16px',
-              padding: '8px 16px',
               cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: '500'
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              flexShrink: 0
             }}
           >
-            send
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ transform: 'translateX(1px)' }}>
+              <path d="M5 10L15 10M15 10L11 6M15 10L11 14" stroke="#666" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </button>
         </div>
       </div>
