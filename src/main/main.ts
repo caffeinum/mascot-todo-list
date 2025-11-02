@@ -31,9 +31,6 @@ function createWindow() {
   // always load from file in production build
   mainWindow.loadFile(path.join(__dirname, '../public/index.html'));
 
-  // open dev tools for debugging
-  mainWindow.webContents.openDevTools({ mode: 'detach' });
-
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
