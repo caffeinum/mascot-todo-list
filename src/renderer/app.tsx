@@ -32,21 +32,6 @@ function App() {
           position: 'relative'
         } as any}
       >
-        {/* drag handle behind emoji */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            background: 'rgba(0, 0, 0, 0.2)',
-            WebkitAppRegion: 'drag',
-            cursor: 'move',
-            zIndex: 998
-          } as any}
-        />
         {/* emoji in top-right */}
         <div 
           onClick={(e) => {
@@ -57,7 +42,7 @@ function App() {
           style={{
             position: 'absolute',
             top: '16px',
-            right: '16px',
+            right: '40px',
             fontSize: '64px',
             userSelect: 'none',
             WebkitUserSelect: 'none',
@@ -69,6 +54,21 @@ function App() {
         >
           🥺
         </div>
+        {/* small drag handle to the right of emoji */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '32px',
+            right: '12px',
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            background: 'rgba(0, 0, 0, 0.3)',
+            WebkitAppRegion: 'drag',
+            cursor: 'move',
+            zIndex: 1000
+          } as any}
+        />
       </div>
     );
   }
@@ -82,28 +82,12 @@ function App() {
       boxSizing: 'border-box',
       position: 'relative'
     }}>
-      {/* drag handle behind emoji */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '8px',
-          right: '8px',
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          background: 'rgba(0, 0, 0, 0.2)',
-          WebkitAppRegion: 'drag',
-          cursor: 'move',
-          zIndex: 998
-        } as any}
-      />
-
       {/* emoji in top-right */}
       <div 
         style={{
           position: 'absolute',
           top: '16px',
-          right: '16px',
+          right: '40px',
           fontSize: '64px',
           userSelect: 'none',
           WebkitAppRegion: 'drag',
@@ -112,6 +96,22 @@ function App() {
       >
         🥺
       </div>
+
+      {/* small drag handle to the right of emoji */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '32px',
+          right: '12px',
+          width: '20px',
+          height: '20px',
+          borderRadius: '50%',
+          background: 'rgba(0, 0, 0, 0.3)',
+          WebkitAppRegion: 'drag',
+          cursor: 'move',
+          zIndex: 1000
+        } as any}
+      />
 
       {/* chat container */}
       <div style={{
