@@ -1,10 +1,34 @@
 {
   "name": "mascot-todo-list",
-  "module": "index.ts",
+  "version": "0.1.0",
   "type": "module",
   "private": true,
+  "main": "dist/main/main.js",
+  "scripts": {
+    "dev": "bun run dev:renderer & bun run dev:electron",
+    "dev:renderer": "bun build src/renderer/app.tsx --outdir=public --watch",
+    "dev:electron": "NODE_ENV=development electron .",
+    "build": "bun run build:renderer && bun run build:main",
+    "build:renderer": "bun build src/renderer/app.tsx --outdir=public --minify",
+    "build:main": "bun build src/main/main.ts src/preload/preload.ts --outdir=dist/main --target=node --minify",
+    "start": "electron .",
+    "package": "electron-builder"
+  },
+  "build": {
+    "appId": "com.mascot.overlay",
+    "productName": "AI Agent Overlay",
+    "files": [
+      "dist/**/*",
+      "public/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities"
+    }
+  },
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
     "autoprefixer": "^10.4.21",
     "electron": "^39.0.0",
     "electron-builder": "^26.0.12",
@@ -13,5 +37,9 @@
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   }
 }
