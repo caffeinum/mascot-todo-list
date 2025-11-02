@@ -30,17 +30,16 @@ function App() {
   if (!showChat) {
     return (
       <div 
-        className="draggable"
         style={{
           width: '100vw',
           height: '100vh',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
-        }}
+          justifyContent: 'center',
+          WebkitAppRegion: 'drag'
+        } as any}
       >
         <div 
-          className="clickable"
           onClick={(e) => {
             e.stopPropagation();
             setShowChat(true);
@@ -49,8 +48,9 @@ function App() {
             fontSize: '96px',
             userSelect: 'none',
             WebkitUserSelect: 'none',
-            cursor: 'pointer'
-          }}
+            cursor: 'pointer',
+            WebkitAppRegion: 'no-drag'
+          } as any}
         >
           🥺
         </div>
@@ -72,13 +72,13 @@ function App() {
     }}>
       {/* header */}
       <div 
-        className="draggable"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '12px'
-        }}
+          marginBottom: '12px',
+          WebkitAppRegion: 'drag'
+        } as any}
       >
         <span style={{ fontSize: '24px' }}>🥺</span>
         <button
