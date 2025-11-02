@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "main": "dist/main/main.js",
+  "main": "dist/main.js",
   "scripts": {
     "dev": "bun run dev:renderer & bun run dev:electron",
     "dev:renderer": "bun build src/renderer/app.tsx --outdir=public --watch",
     "dev:electron": "NODE_ENV=development electron .",
     "build": "bun run build:renderer && bun run build:main",
     "build:renderer": "bun build src/renderer/app.tsx --outdir=public --minify",
-    "build:main": "bun build src/main/main.ts src/preload/preload.ts --outdir=dist/main --target=node --minify",
+    "build:main": "bun build src/main/main.ts --outfile=dist/main.js --target=node --external electron && bun build src/preload/preload.ts --outfile=dist/preload.js --target=node --external electron",
     "start": "electron .",
     "package": "electron-builder"
   },

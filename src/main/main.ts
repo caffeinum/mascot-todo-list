@@ -20,7 +20,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, '../preload/preload.js'),
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
 
@@ -28,7 +28,7 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.webContents.openDevTools({ mode: 'detach' });
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../../public/index.html'));
+    mainWindow.loadFile(path.join(__dirname, '../public/index.html'));
   }
 
   mainWindow.on('closed', () => {
