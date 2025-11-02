@@ -6,9 +6,11 @@ import { useLocalStorage } from "./hooks/useLocalStorage";
 
 const API_KEY_STORAGE = "ELECTRON_GOOGLE_GENERATIVE_AI_API_KEY";
 
+type Message = { role: "user" | "ai"; content: string };
+
 function App() {
   const [showChat, setShowChat] = useState(false);
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [apiKey, setApiKey] = useLocalStorage<string>(API_KEY_STORAGE, "");
@@ -25,19 +27,19 @@ function App() {
 
     const userMessage = input;
     setInput("");
-    const updatedMessages = [...messages, `You: ${userMessage}`];
+    const updatedMessages: Message[] = [...messages, { role: "user", content: userMessage }];
     setMessages(updatedMessages);
     setIsLoading(true);
 
     try {
       if (!apiKey || !google) {
-        setMessages((prev) => [...prev, "AI: Missing API key. Click the emoji to set it."]);
+        setMessages((prev) => [...prev, { role: "ai", content: "Missing API key. Click the emoji to set it." }]);
         return;
       }
 
       // build conversation history for context
       const conversationHistory = updatedMessages
-        .map(msg => msg.replace(/^(You|AI): /, ''))
+        .map(msg => msg.content)
         .join('\n');
 
       const { text } = await generateText({
@@ -45,10 +47,10 @@ function App() {
         prompt: conversationHistory,
       });
 
-      setMessages((prev) => [...prev, `AI: ${text}`]);
+      setMessages((prev) => [...prev, { role: "ai", content: text }]);
     } catch (error) {
       console.error("Error calling Gemini:", error);
-      setMessages((prev) => [...prev, "AI: Error generating response"]);
+      setMessages((prev) => [...prev, { role: "ai", content: "Error generating response" }]);
     } finally {
       setIsLoading(false);
     }
@@ -282,6 +284,7 @@ function App() {
             overflowY: "auto",
             display: "flex",
             flexDirection: "column",
+            justifyContent: "flex-end",
             gap: "8px",
             marginBottom: "12px",
           }}
@@ -298,37 +301,57 @@ function App() {
               start chatting...
             </div>
           ) : (
-            messages.map((msg, i) => (
-              <div
-                key={i}
-                style={{
-                  background: "white",
-                  color: "#333",
-                  padding: "12px 16px",
-                  borderRadius: "20px",
-                  maxWidth: "85%",
-                  alignSelf: "flex-start",
-                  fontSize: "14px",
-                  wordWrap: "break-word",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                  position: "relative",
-                }}
-              >
+            messages.map((msg, i) => {
+              const isUser = msg.role === "user";
+              const isAI = msg.role === "ai";
+              return (
                 <div
+                  key={i}
                   style={{
-                    position: "absolute",
-                    left: "-8px",
-                    bottom: "12px",
-                    width: "0",
-                    height: "0",
-                    borderRight: "8px solid white",
-                    borderTop: "8px solid transparent",
-                    borderBottom: "8px solid transparent",
+                    background: isUser ? "white" : "#0a84ff",
+                    color: isUser ? "#333" : "white",
+                    padding: "12px 16px",
+                    borderRadius: "20px",
+                    maxWidth: "85%",
+                    alignSelf: isUser ? "flex-end" : "flex-start",
+                    fontSize: "14px",
+                    wordWrap: "break-word",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                    position: "relative",
                   }}
-                />
-                {msg}
-              </div>
-            ))
+                >
+                  {isUser && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        right: "-8px",
+                        bottom: "12px",
+                        width: "0",
+                        height: "0",
+                        borderLeft: "8px solid white",
+                        borderTop: "8px solid transparent",
+                        borderBottom: "8px solid transparent",
+                      }}
+                    />
+                  )}
+                  {isAI && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: "-8px",
+                        bottom: "12px",
+                        width: "0",
+                        height: "0",
+                        borderRight: "8px solid #0a84ff",
+                        borderTop: "8px solid transparent",
+                        borderBottom: "8px solid transparent",
+                      }}
+                    />
+                  )}
+                  {msg.content}
+                </div>
+              );
+            })
           )}
         </div>
 
