@@ -1,14 +1,20 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateText } from "ai";
+import { generateObject } from "ai";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { MOTI_SYSTEM_PROMPT } from "./constants/moti";
 import { MarkdownText } from "./components/MarkdownText";
+import { z } from "zod";
 
 const API_KEY_STORAGE = "ELECTRON_GOOGLE_GENERATIVE_AI_API_KEY";
 
-type Message = { role: "user" | "ai"; content: string };
+type Message = { 
+  role: "user" | "ai"
+  content: string
+  reflection?: string
+  showReflection?: boolean
+};
 
 function App() {
   const [showChat, setShowChat] = useState(false);
@@ -55,15 +61,9 @@ function App() {
     return () => clearInterval(interval);
   }, [timerEnd]);
 
-  const extractTimeAndStartTimer = (aiMessage: string) => {
-    // look for "⏱️ X minutes" or "⏱️ X seconds"
-    const timeMatch = aiMessage.match(/⏱️\s*(\d+)\s*(minute|second)s?/i);
-    if (timeMatch && timeMatch[1] && timeMatch[2]) {
-      const amount = parseInt(timeMatch[1]);
-      const unit = timeMatch[2].toLowerCase();
-      const ms = unit === "minute" ? amount * 60000 : amount * 1000;
-      setTimerEnd(Date.now() + ms);
-    }
+  const startTimer = (timeMinutes: number) => {
+    const ms = timeMinutes * 60000;
+    setTimerEnd(Date.now() + ms);
   };
 
   const handleSend = async () => {
@@ -86,14 +86,28 @@ function App() {
         .map(msg => `${msg.role === "user" ? "user" : "moti"}: ${msg.content}`)
         .join('\n');
 
-      const { text } = await generateText({
+      const { object } = await generateObject({
         model: google("gemini-2.5-flash"),
         system: MOTI_SYSTEM_PROMPT,
         prompt: conversationHistory,
+        schema: z.object({
+          reflection: z.string().describe("your internal analysis"),
+          task: z.string().describe("the specific action for the user"),
+          timeMinutes: z.number().describe("time limit in minutes"),
+          hope: z.string().describe("why this task is right"),
+        }),
       });
 
-      setMessages((prev) => [...prev, { role: "ai", content: text }]);
-      extractTimeAndStartTimer(text);
+      const content = `${object.task}\n\n⏱️ ${object.timeMinutes >= 1 ? `${object.timeMinutes} minutes` : `${object.timeMinutes * 60} seconds`}`;
+      const reflection = `**reflection:** ${object.reflection}\n\n**hope:** ${object.hope}`;
+      
+      setMessages((prev) => [...prev, { 
+        role: "ai", 
+        content,
+        reflection,
+        showReflection: false
+      }]);
+      startTimer(object.timeMinutes);
     } catch (error) {
       console.error("Error calling Gemini:", error);
       setApiKey("");
@@ -377,47 +391,91 @@ function App() {
                   <div
                     key={i}
                     style={{
-                      background: "white",
-                      color: "#333",
-                      padding: "12px 16px",
-                      borderRadius: "20px",
                       maxWidth: "85%",
                       alignSelf: isUser ? "flex-end" : "flex-start",
-                      fontSize: "14px",
-                      wordWrap: "break-word",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                      position: "relative",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "4px",
                     }}
                   >
-                    {isUser && (
+                    {isAI && msg.reflection && (
+                      <button
+                        onClick={() => {
+                          setMessages(prev => prev.map((m, idx) => 
+                            idx === i ? { ...m, showReflection: !m.showReflection } : m
+                          ))
+                        }}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#999",
+                          fontSize: "12px",
+                          cursor: "pointer",
+                          padding: "4px 8px",
+                          textAlign: "left",
+                          alignSelf: "flex-start",
+                        }}
+                      >
+                        {msg.showReflection ? "hide thinking" : "show thinking"}
+                      </button>
+                    )}
+                    {isAI && msg.showReflection && msg.reflection && (
                       <div
                         style={{
-                          position: "absolute",
-                          right: "-8px",
-                          bottom: "12px",
-                          width: "0",
-                          height: "0",
-                          borderLeft: "8px solid white",
-                          borderTop: "8px solid transparent",
-                          borderBottom: "8px solid transparent",
+                          background: "#f5f5f7",
+                          color: "#666",
+                          padding: "8px 12px",
+                          borderRadius: "12px",
+                          fontSize: "12px",
+                          fontStyle: "italic",
+                          marginBottom: "4px",
                         }}
-                      />
+                      >
+                        <MarkdownText content={msg.reflection} />
+                      </div>
                     )}
-                    {isAI && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          left: "-8px",
-                          bottom: "12px",
-                          width: "0",
-                          height: "0",
-                          borderRight: "8px solid white",
-                          borderTop: "8px solid transparent",
-                          borderBottom: "8px solid transparent",
-                        }}
-                      />
-                    )}
-                    <MarkdownText content={msg.content} />
+                    <div
+                      style={{
+                        background: "white",
+                        color: "#333",
+                        padding: "12px 16px",
+                        borderRadius: "20px",
+                        fontSize: "14px",
+                        wordWrap: "break-word",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                        position: "relative",
+                      }}
+                    >
+                      {isUser && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            right: "-8px",
+                            bottom: "12px",
+                            width: "0",
+                            height: "0",
+                            borderLeft: "8px solid white",
+                            borderTop: "8px solid transparent",
+                            borderBottom: "8px solid transparent",
+                          }}
+                        />
+                      )}
+                      {isAI && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: "-8px",
+                            bottom: "12px",
+                            width: "0",
+                            height: "0",
+                            borderRight: "8px solid white",
+                            borderTop: "8px solid transparent",
+                            borderBottom: "8px solid transparent",
+                          }}
+                        />
+                      )}
+                      <MarkdownText content={msg.content} />
+                    </div>
                   </div>
                 );
               })
@@ -507,14 +565,20 @@ function App() {
                   .map(msg => `${msg.role === "user" ? "user" : "moti"}: ${msg.content}`)
                   .join('\n')
 
-                const { text } = await generateText({
+                const { object } = await generateObject({
                   model: google("gemini-2.5-flash"),
                   system: MOTI_SYSTEM_PROMPT,
                   prompt: conversationHistory,
+                  schema: z.object({
+                    reflection: z.string().describe("your internal analysis"),
+                    task: z.string().describe("the specific action for the user"),
+                    timeMinutes: z.number().describe("time limit in minutes"),
+                    hope: z.string().describe("why this task is right"),
+                  }),
                 })
 
-                setMessages((prev) => [...prev, { role: "ai", content: text }])
-                extractTimeAndStartTimer(text)
+                setMessages((prev) => [...prev, { role: "ai", content: object.task, reflection: object.reflection, showReflection: false }])
+                startTimer(object.timeMinutes)
               } catch (error) {
                 console.error("Error calling Gemini:", error)
                 setApiKey("")
@@ -559,14 +623,28 @@ function App() {
                   .map(msg => `${msg.role === "user" ? "user" : "moti"}: ${msg.content}`)
                   .join('\n')
 
-                const { text } = await generateText({
+                const { object } = await generateObject({
                   model: google("gemini-2.5-flash"),
                   system: MOTI_SYSTEM_PROMPT,
                   prompt: conversationHistory,
+                  schema: z.object({
+                    reflection: z.string().describe("your internal analysis"),
+                    task: z.string().describe("the specific action for the user"),
+                    timeMinutes: z.number().describe("time limit in minutes"),
+                    hope: z.string().describe("why this task is right"),
+                  }),
                 })
 
-                setMessages((prev) => [...prev, { role: "ai", content: text }])
-                extractTimeAndStartTimer(text)
+                const content = `${object.task}\n\n⏱️ ${object.timeMinutes >= 1 ? `${object.timeMinutes} minutes` : `${object.timeMinutes * 60} seconds`}`
+                const reflection = `**reflection:** ${object.reflection}\n\n**hope:** ${object.hope}`
+                
+                setMessages((prev) => [...prev, { 
+                  role: "ai", 
+                  content,
+                  reflection,
+                  showReflection: false
+                }])
+                startTimer(object.timeMinutes)
               } catch (error) {
                 console.error("Error calling Gemini:", error)
                 setApiKey("")
