@@ -134,7 +134,7 @@ function App() {
         {/* close button */}
         <div style={{
           display: 'flex',
-          justifyContent: 'flex-end'
+          justifyContent: 'flex-start'
         }}>
           <button
             onClick={() => setShowChat(false)}
