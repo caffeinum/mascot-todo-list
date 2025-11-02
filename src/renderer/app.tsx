@@ -1,6 +1,6 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 
@@ -16,11 +16,16 @@ function App() {
   const [apiKey, setApiKey] = useLocalStorage<string>(API_KEY_STORAGE, "");
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [tempKey, setTempKey] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const google = useMemo(() => {
     if (!apiKey) return null;
     return createGoogleGenerativeAI({ apiKey });
   }, [apiKey]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -359,6 +364,7 @@ function App() {
                 );
               })
             )}
+            <div ref={messagesEndRef} />
           </div>
         </div>
 
