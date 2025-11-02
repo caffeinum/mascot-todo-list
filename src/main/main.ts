@@ -42,9 +42,9 @@ function createWindow() {
     const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
     
     if (show) {
-      // expand to chat mode
-      mainWindow.setSize(350, 500);
-      mainWindow.setPosition(screenWidth - 370, 40);
+      // expand to chat mode - taller to fit emoji + chat
+      mainWindow.setSize(200, 550);
+      mainWindow.setPosition(screenWidth - 220, 40);
     } else {
       // collapse to emoji
       mainWindow.setSize(120, 120);
