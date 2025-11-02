@@ -28,8 +28,6 @@ function App() {
           width: '100vw',
           height: '100vh',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           WebkitAppRegion: 'drag',
           border: '2px solid red',
           position: 'relative'
@@ -40,7 +38,7 @@ function App() {
           style={{
             position: 'absolute',
             top: '8px',
-            right: '8px',
+            left: '8px',
             width: '40px',
             height: '40px',
             borderRadius: '50%',
@@ -50,6 +48,7 @@ function App() {
             zIndex: 1000
           } as any}
         />
+        {/* emoji in top-right */}
         <div 
           onClick={(e) => {
             e.stopPropagation();
@@ -57,7 +56,10 @@ function App() {
             setShowChat(true);
           }}
           style={{
-            fontSize: '96px',
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            fontSize: '64px',
             userSelect: 'none',
             WebkitUserSelect: 'none',
             cursor: 'pointer',
@@ -77,20 +79,17 @@ function App() {
       width: '100vw',
       height: '100vh',
       display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'stretch',
       padding: '16px',
       boxSizing: 'border-box',
       border: '2px solid red',
-      position: 'relative',
-      gap: '12px'
+      position: 'relative'
     }}>
       {/* drag handle */}
       <div
         style={{
           position: 'absolute',
           top: '8px',
-          right: '8px',
+          left: '8px',
           width: '40px',
           height: '40px',
           borderRadius: '50%',
@@ -101,9 +100,26 @@ function App() {
         } as any}
       />
 
-      {/* chat container on left */}
+      {/* emoji in top-right */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: '16px',
+          right: '16px',
+          fontSize: '64px',
+          userSelect: 'none',
+          WebkitAppRegion: 'drag',
+          border: '2px solid red',
+          zIndex: 999
+        } as any}
+      >
+        🥺
+      </div>
+
+      {/* chat container */}
       <div style={{
-        flex: 1,
+        width: '100%',
+        height: '100%',
         background: 'rgba(255, 255, 255, 0.98)',
         backdropFilter: 'blur(20px)',
         borderRadius: '16px',
@@ -216,19 +232,6 @@ function App() {
             send
           </button>
         </div>
-      </div>
-
-      {/* emoji on right */}
-      <div 
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          WebkitAppRegion: 'drag',
-          border: '2px solid red'
-        } as any}
-      >
-        <div style={{ fontSize: '96px', userSelect: 'none', border: '2px solid red' }}>🥺</div>
       </div>
     </div>
   );
