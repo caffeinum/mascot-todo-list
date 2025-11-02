@@ -366,6 +366,60 @@ function App() {
                 );
               })
             )}
+            {isLoading && (
+              <div
+                style={{
+                  background: "#0a84ff",
+                  color: "white",
+                  padding: "12px 16px",
+                  borderRadius: "20px",
+                  maxWidth: "85%",
+                  alignSelf: "flex-start",
+                  fontSize: "14px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "-8px",
+                    bottom: "12px",
+                    width: "0",
+                    height: "0",
+                    borderRight: "8px solid #0a84ff",
+                    borderTop: "8px solid transparent",
+                    borderBottom: "8px solid transparent",
+                  }}
+                />
+                <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+                  <div style={{ 
+                    width: "6px", 
+                    height: "6px", 
+                    borderRadius: "50%", 
+                    background: "white",
+                    animation: "pulse 1.4s ease-in-out infinite",
+                    animationDelay: "0s"
+                  }} />
+                  <div style={{ 
+                    width: "6px", 
+                    height: "6px", 
+                    borderRadius: "50%", 
+                    background: "white",
+                    animation: "pulse 1.4s ease-in-out infinite",
+                    animationDelay: "0.2s"
+                  }} />
+                  <div style={{ 
+                    width: "6px", 
+                    height: "6px", 
+                    borderRadius: "50%", 
+                    background: "white",
+                    animation: "pulse 1.4s ease-in-out infinite",
+                    animationDelay: "0.4s"
+                  }} />
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
         </div>
@@ -378,13 +432,13 @@ function App() {
             alignItems: "center",
           }}
         >
-          <input
-            type="text"
+          <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSend();
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault()
+                handleSend()
               }
             }}
             placeholder="did you complete it? or tell me what happened..."
@@ -399,6 +453,10 @@ function App() {
               background: "white",
               boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
               color: "#333",
+              resize: "none",
+              minHeight: "50px",
+              maxHeight: "150px",
+              overflowY: "auto",
             }}
           />
           <button

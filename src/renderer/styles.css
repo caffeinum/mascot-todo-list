@@ -11,3 +11,12 @@ body {
 button, input, a {
   -webkit-app-region: no-drag;
 }
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
