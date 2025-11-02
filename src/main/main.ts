@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, screen, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -33,6 +33,23 @@ function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  // handle chat toggle
+  ipcMain.on('toggle-chat', (_event, show: boolean) => {
+    if (!mainWindow) return;
+    
+    const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
+    
+    if (show) {
+      // expand to chat mode
+      mainWindow.setSize(350, 500);
+      mainWindow.setPosition(screenWidth - 370, 40);
+    } else {
+      // collapse to emoji
+      mainWindow.setSize(120, 120);
+      mainWindow.setPosition(screenWidth - 140, 40);
+    }
   });
 }
 

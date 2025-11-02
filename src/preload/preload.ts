@@ -1,5 +1,5 @@
-import { contextBridge } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // add ipc handlers here later
+  toggleChat: (show: boolean) => ipcRenderer.send('toggle-chat', show)
 });
