@@ -124,7 +124,6 @@ function App() {
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        gap: '8px',
         boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
         border: '1px solid rgba(0,0,0,0.1)'
       }}>
@@ -155,8 +154,7 @@ function App() {
           display: 'flex',
           flexDirection: 'column',
           gap: '8px',
-          minHeight: '100px',
-          maxHeight: '180px'
+          marginBottom: '12px'
         }}>
           {messages.length === 0 ? (
             <div style={{
