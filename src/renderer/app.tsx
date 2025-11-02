@@ -428,6 +428,118 @@ function App() {
           </div>
         </div>
 
+        {/* quick reply buttons */}
+        <div
+          style={{
+            display: "flex",
+            gap: "8px",
+            marginBottom: "8px",
+          }}
+        >
+          <button
+            onClick={async () => {
+              if (isLoading) return
+              setInput("yes")
+              const userMessage = "yes"
+              const updatedMessages: Message[] = [...messages, { role: "user", content: userMessage }]
+              setMessages(updatedMessages)
+              setIsLoading(true)
+
+              try {
+                if (!apiKey || !google) {
+                  setMessages((prev) => [...prev, { role: "ai", content: "hey, i need an api key to help you. click the emoji to set it up." }])
+                  return
+                }
+
+                const conversationHistory = updatedMessages
+                  .map(msg => `${msg.role === "user" ? "user" : "moti"}: ${msg.content}`)
+                  .join('\n')
+
+                const { text } = await generateText({
+                  model: google("gemini-2.5-flash"),
+                  system: MOTI_SYSTEM_PROMPT,
+                  prompt: conversationHistory,
+                })
+
+                setMessages((prev) => [...prev, { role: "ai", content: text }])
+              } catch (error) {
+                console.error("Error calling Gemini:", error)
+                setApiKey("")
+                setMessages((prev) => [...prev, { role: "ai", content: "api key seems invalid. click the emoji to set a new one." }])
+              } finally {
+                setIsLoading(false)
+                setInput("")
+              }
+            }}
+            disabled={isLoading}
+            style={{
+              flex: 1,
+              padding: "10px 16px",
+              borderRadius: "12px",
+              border: "1px solid #ddd",
+              background: "white",
+              cursor: isLoading ? "not-allowed" : "pointer",
+              fontSize: "14px",
+              fontWeight: 500,
+              color: "#333",
+              opacity: isLoading ? 0.5 : 1,
+            }}
+          >
+            yes
+          </button>
+          <button
+            onClick={async () => {
+              if (isLoading) return
+              setInput("no")
+              const userMessage = "no"
+              const updatedMessages: Message[] = [...messages, { role: "user", content: userMessage }]
+              setMessages(updatedMessages)
+              setIsLoading(true)
+
+              try {
+                if (!apiKey || !google) {
+                  setMessages((prev) => [...prev, { role: "ai", content: "hey, i need an api key to help you. click the emoji to set it up." }])
+                  return
+                }
+
+                const conversationHistory = updatedMessages
+                  .map(msg => `${msg.role === "user" ? "user" : "moti"}: ${msg.content}`)
+                  .join('\n')
+
+                const { text } = await generateText({
+                  model: google("gemini-2.5-flash"),
+                  system: MOTI_SYSTEM_PROMPT,
+                  prompt: conversationHistory,
+                })
+
+                setMessages((prev) => [...prev, { role: "ai", content: text }])
+              } catch (error) {
+                console.error("Error calling Gemini:", error)
+                setApiKey("")
+                setMessages((prev) => [...prev, { role: "ai", content: "api key seems invalid. click the emoji to set a new one." }])
+              } finally {
+                setIsLoading(false)
+                setInput("")
+              }
+            }}
+            disabled={isLoading}
+            style={{
+              flex: 1,
+              padding: "10px 16px",
+              borderRadius: "12px",
+              border: "1px solid #ddd",
+              background: "white",
+              cursor: isLoading ? "not-allowed" : "pointer",
+              fontSize: "14px",
+              fontWeight: 500,
+              color: "#333",
+              opacity: isLoading ? 0.5 : 1,
+            }}
+          >
+            no
+          </button>
+        </div>
+
         {/* input */}
         <div
           style={{
