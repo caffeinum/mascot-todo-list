@@ -57,7 +57,8 @@ function App() {
       setMessages((prev) => [...prev, { role: "ai", content: text }]);
     } catch (error) {
       console.error("Error calling Gemini:", error);
-      setMessages((prev) => [...prev, { role: "ai", content: "something went wrong, can you try again?" }]);
+      setApiKey("");
+      setMessages((prev) => [...prev, { role: "ai", content: "api key seems invalid. click the emoji to set a new one." }]);
     } finally {
       setIsLoading(false);
     }
@@ -79,8 +80,10 @@ function App() {
         <div
           onClick={(e) => {
             e.stopPropagation();
-            setTempKey(apiKey || "");
-            setShowKeyModal(true);
+            if (!apiKey) {
+              setTempKey("");
+              setShowKeyModal(true);
+            }
             setShowChat(true);
           }}
           style={
