@@ -32,19 +32,19 @@ function App() {
           position: 'relative'
         } as any}
       >
-        {/* drag handle */}
+        {/* drag handle behind emoji */}
         <div
           style={{
             position: 'absolute',
             top: '8px',
-            left: '8px',
-            width: '40px',
-            height: '40px',
+            right: '8px',
+            width: '80px',
+            height: '80px',
             borderRadius: '50%',
             background: 'rgba(0, 0, 0, 0.2)',
             WebkitAppRegion: 'drag',
             cursor: 'move',
-            zIndex: 1000
+            zIndex: 998
           } as any}
         />
         {/* emoji in top-right */}
@@ -63,7 +63,8 @@ function App() {
             WebkitUserSelect: 'none',
             cursor: 'pointer',
             WebkitAppRegion: 'no-drag',
-            pointerEvents: 'auto'
+            pointerEvents: 'auto',
+            zIndex: 999
           } as any}
         >
           🥺
@@ -81,19 +82,19 @@ function App() {
       boxSizing: 'border-box',
       position: 'relative'
     }}>
-      {/* drag handle */}
+      {/* drag handle behind emoji */}
       <div
         style={{
           position: 'absolute',
           top: '8px',
-          left: '8px',
-          width: '40px',
-          height: '40px',
+          right: '8px',
+          width: '80px',
+          height: '80px',
           borderRadius: '50%',
           background: 'rgba(0, 0, 0, 0.2)',
           WebkitAppRegion: 'drag',
           cursor: 'move',
-          zIndex: 1000
+          zIndex: 998
         } as any}
       />
 
